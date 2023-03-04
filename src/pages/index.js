@@ -6,10 +6,27 @@ import { useRef } from 'react';
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState('');
+  const [currentSalar, setcurrentSalar] = useState('Geral');
   const messageInputRef = useRef(null);
 
+  function start() {
+    const mynameInput = document.querySelector('.myname-input');
+    const salaInput = document.querySelector('.sala-input');
+    if (localStorage.getItem('nick') !== '') {
+      mynameInput.value = localStorage.getItem('nick')
+    }
+    if (localStorage.getItem('sala') !== '') {
+      salaInput.value = localStorage.getItem('sala')
+      setcurrentSalar(localStorage.getItem('sala'))
+    }
+  }
+
   function solicitar() {
-    const response = fetch(`https://script.google.com/macros/s/AKfycbw_MHgPKyOdX61wSh9b1olLU04cd3ioH8pU1fQPdxE04wGpwms6mvJ5a6Sj0q3RrGIX/exec?sala=${'Geral'}`);
+    const salaInput = document.querySelector('.sala-input');
+    localStorage.setItem('sala', salaInput.value);
+    let sala = localStorage.getItem('sala')
+    if (localStorage.getItem('sala') == '') sala = 'Geral'
+    const response = fetch(`https://script.google.com/macros/s/AKfycbw_MHgPKyOdX61wSh9b1olLU04cd3ioH8pU1fQPdxE04wGpwms6mvJ5a6Sj0q3RrGIX/exec?sala=${sala}`);
     response.then(res => res.json()).then(data => setMessages(data));
     const messageContainer = document.querySelector('.message-container');
     messageContainer.scrollTop = messageContainer.scrollHeight
@@ -18,14 +35,19 @@ export default function Home() {
   }
 
   useEffect(() => {
+    start()
     const intervalId = setInterval(solicitar, 2000);
     return () => clearInterval(intervalId);
   }, []);
 
   function handleSendMessage() {
     const mynameInput = document.querySelector('.myname-input');
-    const messageInput = document.querySelector('.message-input');
+    localStorage.setItem('nick', mynameInput.value);
+
     const salaInput = document.querySelector('.sala-input');
+    localStorage.setItem('sala', salaInput.value);
+
+    const messageInput = document.querySelector('.message-input');
     const error = document.querySelector('.error-container');
 
     if (mynameInput.value == '') {
@@ -37,12 +59,13 @@ export default function Home() {
       let user = mynameInput.value;
       let msg = newMessage;
       let room = salaInput.value;
+
       const formId = '1FAIpQLSfQutm0b9ZB8hfebHoPCDp9zxemvr--8up_Xz8zPqIzo4kn0Q';
       const url = `https://docs.google.com/forms/u/0/d/e/${formId}/formResponse`;
       const params = new URLSearchParams();
       params.append('entry.228090609', user);
       params.append('entry.2025985546', msg);
-      params.append('entry.1292555410', 'Geral')
+      params.append('entry.1292555410', room)
 
       const options = {
         method: 'POST',
@@ -95,6 +118,7 @@ export default function Home() {
           <button onClick={handleSendMessage}>Enviar</button>
         </div>
         <div className="error-container"></div>
+        <div className='banco'><a href='https://docs.google.com/spreadsheets/d/16WYjmFzKIJLux4kuLGlYW_km_BazomE7RZjymjlp_dM/edit?usp=sharing' target={'_blank'}> Banco de dados</a></div>
       </main>
     </>
   );

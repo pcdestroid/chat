@@ -27,6 +27,7 @@ button {
   height: 30vw;
   min-height: 300px;
   padding: 15px;
+  user-select: none;
 }
 
 .message-input {
@@ -57,18 +58,45 @@ button {
   flex: 1 0 5px;
 }
 
-.myname-input {
+.myname-input,
+.sala-input,
+.chave-input {
+  width: 100px;
+  margin: 10px;
   flex: 0 0 0x;
+  text-align: center;
 }
 
 .error-container {
   font-family: sans-serif;
   margin-top: 20px;
-  color: red;
+  color: rgb(237, 253, 4);
 }
 
 .you-message {
   font-family: sans-serif;
   color: white;
-  background-color: rgb(0, 189, 117);
+  background-color: rgb(100, 100, 100);
+  user-select: none;
+}
+
+.banco {
+
+  background-color: rgba(255, 255, 255, 0.904);
+  padding: 20px;
+  border-radius: 5px;
+  user-select: none;
+
+}
+
+.banco:hover {
+
+  background-color: rgb(255, 255, 255);
+
+}
+
+a {
+  font: 1em sans-serif;
+  text-decoration: none;
+  color: rgb(0, 0, 0);
 }
