@@ -10,6 +10,13 @@ export default function Home() {
   const messageInputRef = useRef(null);
 
   function start() {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const newSala = urlParams.get('sala');
+    if (newSala !== '') {
+      localStorage.setItem('sala', newSala)
+    }
+
     const mynameInput = document.querySelector('.myname-input');
     const salaInput = document.querySelector('.sala-input');
     if (localStorage.getItem('nick') !== '') {
