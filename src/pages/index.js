@@ -100,8 +100,8 @@ export default function Home() {
           <input type="text" className="myname-input"></input>
           <label>Sala: </label>
           <input type="text" className="sala-input"></input>
-          <label>Chave: </label>
-          <input type="text" className="chave-input"></input>
+          {/* <label>Chave: </label>
+          <input type="text" className="chave-input"></input> */}
         </div>
 
         <div className="message-container">

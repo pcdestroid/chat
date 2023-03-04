@@ -14,6 +14,7 @@ button {
   width: 10vw;
   min-width: 45px;
   border-radius: 5px;
+  user-select: none;
 }
 
 .message-container {
