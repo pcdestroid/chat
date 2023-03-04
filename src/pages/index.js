@@ -6,14 +6,14 @@ import { useRef } from 'react';
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState('');
-  const [currentSalar, setcurrentSalar] = useState('Geral');
+  // const [currentSalar, setcurrentSalar] = useState('Geral');
   const messageInputRef = useRef(null);
 
   function start() {
 
     const urlParams = new URLSearchParams(window.location.search);
     const newSala = urlParams.get('sala');
-    if (newSala !== '') {
+    if (newSala !== '' && newSala !== null) {
       localStorage.setItem('sala', newSala)
     }
 
@@ -24,7 +24,7 @@ export default function Home() {
     }
     if (localStorage.getItem('sala') !== '') {
       salaInput.value = localStorage.getItem('sala')
-      setcurrentSalar(localStorage.getItem('sala'))
+      // setcurrentSalar(localStorage.getItem('sala'))
     }
   }
 
