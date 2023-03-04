@@ -1,16 +1,19 @@
 .sendmessage-container {
   margin-top: 20px;
   display: flex;
+
 }
 
 input {
   margin-right: 15px;
   padding: 10px;
+  border-radius: 5px;
 }
 
 button {
   width: 10vw;
   min-width: 45px;
+  border-radius: 5px;
 }
 
 .message-container {
@@ -22,7 +25,8 @@ button {
   flex-direction: column;
   overflow-y: scroll;
   height: 30vw;
-  min-height: 250px;
+  min-height: 300px;
+  padding: 15px;
 }
 
 .message-input {
@@ -34,6 +38,7 @@ button {
 }
 
 .message {
+  font-family: sans-serif;
   background-color: #f2f2f2;
   padding: 10px;
   margin-bottom: 5px;
@@ -45,6 +50,7 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  color: white;
 }
 
 .myname-container label {
@@ -56,10 +62,13 @@ button {
 }
 
 .error-container {
+  font-family: sans-serif;
   margin-top: 20px;
   color: red;
 }
 
 .you-message {
-  background-color: rgba(0, 255, 76, 0.116);
+  font-family: sans-serif;
+  color: white;
+  background-color: rgb(0, 189, 117);
 }
