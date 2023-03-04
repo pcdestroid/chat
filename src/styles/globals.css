@@ -19,19 +19,22 @@ button {
 .message-container {
   margin-top: 20px;
   display: flex;
-  border: 1px solid black;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 10px;
   width: 80vw;
   height: 50vw;
   flex-direction: column;
   overflow-y: scroll;
   height: 30vw;
   min-height: 300px;
-  padding: 15px;
+  padding: 20px;
   user-select: none;
 }
 
 .message-input {
-  width: 63vw;
+  color: white;
+  width: 70vw;
+  background-color: rgba(0, 0, 0, 0.685);
 }
 
 .chave-container {
