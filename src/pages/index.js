@@ -1,9 +1,12 @@
 import Head from 'next/head';
 import styles from '@/styles/Home.module.css';
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
+
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState('');
+  const messageInputRef = useRef(null);
 
   function solicitar() {
     const response = fetch(`https://script.google.com/macros/s/AKfycbw_MHgPKyOdX61wSh9b1olLU04cd3ioH8pU1fQPdxE04wGpwms6mvJ5a6Sj0q3RrGIX/exec?sala=${'Geral'}`);
@@ -15,7 +18,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const intervalId = setInterval(solicitar, 1000);
+    const intervalId = setInterval(solicitar, 2000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -39,7 +42,7 @@ export default function Home() {
       const params = new URLSearchParams();
       params.append('entry.228090609', user);
       params.append('entry.2025985546', msg);
-      params.append('entry.1292555410', room)
+      params.append('entry.1292555410', 'Geral')
 
       const options = {
         method: 'POST',
@@ -49,6 +52,7 @@ export default function Home() {
       fetch(url, options);
       messageInput.value = '';
       error.innerHTML = '';
+      messageInputRef.current.focus();
     }
   }
   return (
@@ -62,13 +66,11 @@ export default function Home() {
       <main className={styles.main}>
 
         <div className="myname-container">
-          <label>Seu Nick: </label>
+          <label>Nick: </label>
           <input type="text" className="myname-input"></input>
-
-          <label>Nome da sala: </label>
-          <input type="text" className="sala-input" value="Geral"></input>
-
-          <label>Chave da sala: </label>
+          <label>Sala: </label>
+          <input type="text" className="sala-input"></input>
+          <label>Chave: </label>
           <input type="text" className="chave-input"></input>
         </div>
 
@@ -80,7 +82,16 @@ export default function Home() {
           ))}
         </div>
         <div className="sendmessage-container">
-          <input type="text" className="message-input"></input>
+          <input
+            type="text"
+            className="message-input"
+            ref={messageInputRef}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                handleSendMessage();
+              }
+            }}
+          />
           <button onClick={handleSendMessage}>Enviar</button>
         </div>
         <div className="error-container"></div>
