@@ -6,10 +6,10 @@ import { useRef } from 'react';
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState('');
-  // const [currentSalar, setcurrentSalar] = useState('Geral');
   const messageInputRef = useRef(null);
 
   function start() {
+
 
     const urlParams = new URLSearchParams(window.location.search);
     const newSala = urlParams.get('sala');
@@ -17,29 +17,100 @@ export default function Home() {
       localStorage.setItem('sala', newSala)
     }
 
+    const urlParams2 = new URLSearchParams(window.location.search);
+    const newChave = urlParams2.get('chave');
+    if (newChave !== '' && newChave !== null) {
+      localStorage.setItem('chave', newChave)
+    }
+
     const mynameInput = document.querySelector('.myname-input');
     const salaInput = document.querySelector('.sala-input');
+    const chaveInput = document.querySelector('.chave-input');
+
     if (localStorage.getItem('nick') !== '') {
       mynameInput.value = localStorage.getItem('nick')
     }
+
     if (localStorage.getItem('sala') !== '') {
       salaInput.value = localStorage.getItem('sala')
-      // setcurrentSalar(localStorage.getItem('sala'))
     }
+
+    if (localStorage.getItem('chave') !== '') {
+      chaveInput.value = localStorage.getItem('chave')
+    }
+
   }
 
-  function solicitar() {
+  // Importar a biblioteca CryptoJS
+  const CryptoJS = require("crypto-js");
+
+  // Cria um hash SHA-256 da string
+  async function sha256(str) {
+    const buffer = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', buffer)
+      .then(hash => hex(hash));
+  }
+
+  // Converte o buffer de hash em uma string hexadecimal
+  async function hex(buffer) {
+    const hexCodes = [];
+    const view = new DataView(buffer);
+    for (let i = 0; i < view.byteLength; i += 4) {
+      const value = view.getUint32(i);
+      const stringValue = value.toString(16);
+      const padding = '00000000';
+      const paddedValue = (padding + stringValue).slice(-padding.length);
+      hexCodes.push(paddedValue);
+    }
+    return hexCodes.join('');
+  }
+
+  async function solicitar() {
     const salaInput = document.querySelector('.sala-input');
     localStorage.setItem('sala', salaInput.value);
     let sala = localStorage.getItem('sala')
+    const chaveInput = document.querySelector('.chave-input');
+    localStorage.setItem('chave', chaveInput.value);
     if (localStorage.getItem('sala') == '') sala = 'Geral'
+    sala = await sha256(sala)
+
+    // Definir a chave de criptografia
+    const encryptionKey = chaveInput.value;
+
+    // Função para descriptografar
+    function decrypt(ciphertext) {
+      const bytes = CryptoJS.AES.decrypt(ciphertext, encryptionKey);
+      const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+      return plaintext;
+    }
+
     const response = fetch(`https://script.google.com/macros/s/AKfycbw_MHgPKyOdX61wSh9b1olLU04cd3ioH8pU1fQPdxE04wGpwms6mvJ5a6Sj0q3RrGIX/exec?sala=${sala}`);
-    response.then(res => res.json()).then(data => setMessages(data));
+
+    response.then(res => res.json()).then(data => {
+      // Percorrer todas as mensagens no objeto retornado
+      const messages = data.map(message => {
+
+        if (encryptionKey == "") {
+          return message;
+        }
+
+        // Caso contrário, descriptografar a mensagem e retornar um novo objeto com a mensagem descriptografada
+        const decryptedMessage = decrypt(message.message);
+        return {
+          ...message,
+          message: decryptedMessage,
+          encrypted: false // Marcar a mensagem como descriptografada
+        };
+      });
+      setMessages(messages);
+    });
+
     const messageContainer = document.querySelector('.message-container');
     messageContainer.scrollTop = messageContainer.scrollHeight
     const mynameInput = document.querySelector('.myname-input');
     setCurrentUser(mynameInput.value);
   }
+
 
   useEffect(() => {
     start()
@@ -47,12 +118,15 @@ export default function Home() {
     return () => clearInterval(intervalId);
   }, []);
 
-  function handleSendMessage() {
+  async function handleSendMessage() {
     const mynameInput = document.querySelector('.myname-input');
     localStorage.setItem('nick', mynameInput.value);
 
     const salaInput = document.querySelector('.sala-input');
     localStorage.setItem('sala', salaInput.value);
+
+    const chaveInput = document.querySelector('.chave-input');
+    localStorage.setItem('chave', chaveInput.value);
 
     const messageInput = document.querySelector('.message-input');
     const error = document.querySelector('.error-container');
@@ -64,8 +138,18 @@ export default function Home() {
     } else {
       const newMessage = messageInput.value;
       let user = mynameInput.value;
-      let msg = newMessage;
-      let room = salaInput.value;
+
+      // Definir a chave de criptografia
+      const encryptionKey = chaveInput.value;
+
+      // Função para criptografar
+      function encrypt(text) {
+        const ciphertext = CryptoJS.AES.encrypt(text, encryptionKey).toString();
+        return ciphertext;
+      }
+
+      let msg = encrypt(newMessage);
+      let room = await sha256(salaInput.value);
 
       const formId = '1FAIpQLSfQutm0b9ZB8hfebHoPCDp9zxemvr--8up_Xz8zPqIzo4kn0Q';
       const url = `https://docs.google.com/forms/u/0/d/e/${formId}/formResponse`;
@@ -100,8 +184,8 @@ export default function Home() {
           <input type="text" className="myname-input"></input>
           <label>Sala: </label>
           <input type="text" className="sala-input"></input>
-          {/* <label>Chave: </label>
-          <input type="text" className="chave-input"></input> */}
+          <label>Chave: </label>
+          <input type="text" className="chave-input"></input>
         </div>
 
         <div className="message-container">
@@ -125,6 +209,7 @@ export default function Home() {
           <button onClick={handleSendMessage}>Enviar</button>
         </div>
         <div className="error-container"></div>
+        <div className='banco'><a href='https://chat-neon-six.vercel.app/?sala=Mundo&chave=Bitcoin'> Sala: Mundo / Chave: Bitcoin</a></div>
         <div className='banco'><a href='https://docs.google.com/spreadsheets/d/16WYjmFzKIJLux4kuLGlYW_km_BazomE7RZjymjlp_dM/edit?usp=sharing' target={'_blank'}> Banco de dados</a></div>
       </main>
     </>
